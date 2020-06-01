@@ -36,7 +36,7 @@ These files are located in the root of the git repository **wilomaku/CC_seg_clas
 
 ## Instructions to use this repository:
 
-Please pay attention to these instructions and follow carefully. Before proceeding, you must guarantee that your system is as similar as possible to the environment, used libraries and dependencies described before. If this is not possible, you can choose to use Docker (instructions below).
+Please pay attention to these instructions and follow carefully. Before proceeding, you must guarantee that your system is as similar as possible to the environment, used libraries and dependencies described before.
 
 1. Move to your directory: cd <your_dir>
 2. Clone the repository: git clone https://github.com/wilomaku/CC_QC_CNN.git
@@ -44,65 +44,39 @@ Please pay attention to these instructions and follow carefully. Before proceedi
 
 ### Test script (You want to perform quality control on your own segmentation dataset)
 
-4. Download the saved model, with the trained parameters, available in: https://drive.google.com/file/d/1aBYKNaKJqgb0Mfu40W0S0cJKi7UorDZ0/view?usp=sharing
-5. You need to have your test dataset. The framework only works with binary nifti masks (.nii or .nii.gz are the only extensions accepted). Your masks must be in a folder (<your_test_dir>), either directly in the root of <your_test_dir>:
+4. Download the saved model, with the trained parameters, available in: https://drive.google.com/file/d/1aBYKNaKJqgb0Mfu40W0S0cJKi7UorDZ0/view?usp=sharing. Put the model in the 'saves' folder.
+5. You need to have your test dataset. The model only works with the pair image+binary mask, both in nifti format (.nii or .nii.gz are the only extensions accepted). The images and masks must be in a folder (<your_test_dir>), having mask and image for each subject in its respective folder:
 
-```markdown
-- __<your_test_dir>__
-  - [mask1.nii]
-  - [mask2.nii.gz]
-  .
-  .
-  .
-```
-
-or every mask in its respective folder:
 ```markdown
 - __<your_test_dir>__
   - __folder1__
+    - [image1.nii]
     - [mask1.nii]
   - __folder2__
+    - [image2.nii]
     - [mask2.nii]
   .
   .
   .
 ```
 
-It is expected that the nifti mask files are in 2D (in sagittal view) or 3D (in which case, the first dimension refers to the sagittal view). Copy the test dataset into your directory: cp <your_dir>/<your_test_dir>
+Notice the image must contains 'image' in the name of the file, and the mask must contains 'mask' in the name of the file. It is expected that the nifti mask files are in 2D (in sagittal view) or 3D (in which case, the first dimension refers to the sagittal view). Copy the test dataset into your directory: cp <your_dir>/<your_test_dir>
 
-6. Run the test script providing the proper arguments: python test.py <dir_in> <pattern> <msp> <-opt_th>
+6. Run the test script providing the proper arguments: python test.py
 
-dir_in: Databse input directory.
--pattern[Optional]: Input a string pattern that is present in all the nifti file names. If no particular pattern is present in your name files, do not pass anything.
--msp[Optional]: Slice to be selected on sagittal plane. If 3D masks are used, you must pass a slice with a valid mask. Please note that the by-default value is 90. If 2D masks are used, do not pass anything.
--opt_th[Optional]: Decision threshold to separate classes. If this value is not passed, the optimal threshold is used instead.
-
-Examples: 
-* python test.py /home/jovyan/work/dataset/ (Example with 2D masks with no particular pattern in file names)
-* python test.py /home/jovyan/work/dataset/ -pattern mask -opt_th 0.5 (Example with 2D masks with 'mask' string present in file names to be evaluated. The decision threshold applied is 0.5)
-* python test.py /home/jovyan/work/dataset/ -msp 100 -opt_th 0.5 (Example with 3D masks. The 100th sagittal slice is selected. The decision threshold applied is 0.5)
-
-7. After executed, the output file with the quality score will be available in the save directory (the save directory path (DIR_SAVE) can be changed in **default_config.py**).
+7. After executed, the output file with the quality score will be available in the save directory.
 
 ### Train script (You want to train the framework using your dataset)
 
-4. You need to have your dataset. The framework only works with binary nifti masks (.nii or .nii.gz are the only extensions accepted). Your masks must be in a folder (<your_test_dir>) either directly in the root of <your_test_dir>:
+4. You need to have your dataset. The framework only works with binary nifti masks (.nii or .nii.gz are the only extensions accepted). The images and masks must be in a folder (<your_test_dir>), having mask and image for each subject in its respective folder:
 
-```markdown
-- __<your_test_dir>__
-  - [mask1.nii]
-  - [mask2.nii.gz]
-  .
-  .
-  .
-```
-
-or every mask in its respective folder:
 ```markdown
 - __<your_test_dir>__
   - __folder1__
+    - [image1.nii]
     - [mask1.nii]
   - __folder2__
+    - [image2.nii]
     - [mask2.nii]
   .
   .
@@ -113,23 +87,7 @@ It is expected that the nifti mask files are in 2D (in sagittal view) or 3D (in 
 
 5. You need to have the proper labels for training the model. The label files must be in a csv file named **labels.csv** with two columns: 'Subject', containing the path or a partial identifier of the name; and 'Label', containing the label associated to every Subject (0 for correct segmentation and 1 for incorrect segmentation).
 
-6. Set the hyper-parameters according to your dataset. I recommend you run the notebook **main.ipynb** to make sure your configuration and outputs are working as expected before run the train script. This notebook works in the same way as the train script.
-
-7. Run the train script: python main.py. The script will save the trained models in the save directory (the save directory path (DIR_SAVE) can be changed in **default_config.py**).
-
-### Instructions to execute on Docker image in either, test or train mode:
-
-Because the model is fully dependant on the Scikit-learn version, I used a Docker image to guarantee reproducibility from now on. The Docker image fulfills all the software requirements and is only necessary to provide the cloned repository with the scripts. I used a public image in a Docker Hub with the required configuration to execute the scripts, including Nibabel to deal with nifti files.
-
-4. Install Docker on your machine: https://docs.docker.com/install/
-
-5. Download Docker image: docker pull miykael/nipype_level0 (https://hub.docker.com/r/miykael/nipype_level0)
-
-6. Run Docker on Jupyter mode: docker run -p 8889:8888 -v ~/Documents/:/home/jovyan/work -it miykael/nipype_level0 (Notice that port 8888 is being mapped to port 8889 when opening Jupyter)
-
-7. Run Docker on terminal mode: docker run -v ~/Documents/:/home/jovyan/work -it miykael/nipype_level0 /bin/bash
-
-8. When in the Docker prompt, you can proceed with the Instructions to either **Test script** or **Train script** as explained previously.
+6. Set the hyper-parameters according to your dataset. Run the notebook **main.ipynb** to make sure your configuration and outputs are working as expected before run the train script.
 
 Questions? Suggestions? Please write to wjgarciah@unal.edu.co
 
