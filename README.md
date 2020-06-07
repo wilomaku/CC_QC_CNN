@@ -1,4 +1,4 @@
-# A framework for quality control of corpus callosum segmentation in large-scale studies
+# Automatic CNN-based model for quality control of corpus callosum segmentation in large-scale studies
 
 ## Reproducible paper
 
