@@ -4,7 +4,7 @@
 
 This Readme file holds instructions for reproducing the study **Automatic quality control on corpus callosum segmentation: Comparing deep and classical machine learning approaches**
 
-![Alt text](images/Graphical_abstract.png?raw=true "Title")
+![Alt text](images/Graphical_abstract_CNN.png?raw=true "Title")
 
 ## Environment, used libraries and dependencies
 
